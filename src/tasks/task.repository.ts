@@ -1,3 +1,4 @@
+import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -19,8 +20,10 @@ export class TaskRepository extends Repository<Task> {
     return task;
   }
 
-  async getTasks(): Promise<Task[]> {
+  async getTasks(@GetUser() user: User): Promise<Task[]> {
     const query = this.createQueryBuilder('task');
+
+    query.where('task.userId = :userId', { userId: user.id });
     const tasks = await query.getMany();
     return tasks;
   }
